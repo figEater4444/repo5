@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Paper MCQ System</title>
+    <style>
+        :root {
+            --color-primary: #2d7a8a;
+            --color-primary-light: #e8f5f7;
+            --color-text: #1a1a1a;
+            --color-border: #d0d0d0;
+            --color-bg: #f9f9f9;
+            --color-success: #27ae60;
+            --color-danger: #e74c3c;
+            --color-correct: #d4edda;
+            --color-incorrect: #f8d7da;
+            --color-warning: #fff3cd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        /* Login Screen Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--color-primary), #1a5a66);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: var(--color-primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .login-form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        label .required {
+            color: var(--color-danger);
+            margin-left: 3px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-light);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .button-full {
+            width: 100%;
+        }
+
+        .button-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: #236370;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(45, 122, 138, 0.3);
+        }
+
+        .button-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .button-secondary:hover {
+            background: #5a6268;
+        }
+
+        .button-danger {
+            background: var(--color-danger);
+            color: white;
+        }
+
+        .button-danger:hover {
+            background: #c0392b;
+        }
+
+        .button-success {
+            background: var(--color-success);
+            color: white;
+        }
+
+        .button-success:hover {
+            background: #1e8449;
+        }
+
+        .error-message, .success-message, .info-message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .error-message {
+            background: var(--color-incorrect);
+            color: var(--color-danger);
+        }
+
+        .success-message {
+            background: var(--color-correct);
+            color: var(--color-success);
+        }
+
+        .info-message {
+            background: var(--color-warning);
+            color: #856404;
+        }
+
+        .user-info {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .user-info strong {
+            color: var(--color-primary);
+        }
+
+        .user-details {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .logout-btn {
+            background: var(--color-danger);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .db-status {
+            background: var(--color-correct);
+            color: var(--color-success);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+
+        /* Paper Selection */
+        .paper-selector {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .paper-selector h3 {
+            color: var(--color-primary);
+            margin-bottom: 15px;
+        }
+
+        .paper-info-display {
+            background: var(--color-primary-light);
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .paper-info-display strong {
+            color: var(--color-primary);
+        }
+
+        /* Main Application Styles */
+        .app-container {
+            display: none;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--color-primary), #1a5a66);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            color: var(--color-primary);
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-bottom: 2px solid var(--color-primary-light);
+            padding-bottom: 10px;
+        }
+
+        .image-upload-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 2px dashed var(--color-border);
+        }
+
+        .image-upload-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .image-preview {
+            margin-top: 10px;
+            max-width: 100%;
+        }
+
+        .image-preview img {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 4px;
+            border: 1px solid var(--color-border);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .question-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid var(--color-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .options-list {
+            margin-left: 20px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .correct-answer {
+            color: var(--color-success);
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .delete-btn {
+            background: var(--color-danger);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        #preview {
+            background: white;
+            padding: 40px;
+            min-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        /* Paper List Styles */
+        .paper-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--color-border);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .paper-card:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 4px 8px rgba(45, 122, 138, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .paper-card.selected {
+            border-color: var(--color-primary);
+            background: var(--color-primary-light);
+        }
+
+        .paper-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .paper-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .paper-meta {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .paper-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .paper-stat {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .paper-stat strong {
+            color: var(--color-primary);
+        }
+
+        /* Test Window Styles */
+        .test-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .test-modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .test-header {
+            background: var(--color-primary);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .test-question {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+
+        .test-question.correct {
+            background: var(--color-correct);
+            border-color: var(--color-success);
+        }
+
+        .test-question.incorrect {
+            background: var(--color-incorrect);
+            border-color: var(--color-danger);
+        }
+
+        .test-question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .test-question-image {
+            margin: 15px 0;
+        }
+
+        .test-question-image img {
+            max-width: 300px;
+            max-height: 200px;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+        }
+
+        .test-options {
+            margin-top: 15px;
+        }
+
+        .test-option {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border: 2px solid var(--color-border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .test-option:hover {
+            background: var(--color-primary-light);
+            border-color: var(--color-primary);
+        }
+
+        .test-option.selected {
+            background: var(--color-primary-light);
+            border-color: var(--color-primary);
+            font-weight: 500;
+        }
+
+        .test-option.correct-option {
+            background: var(--color-correct);
+            border-color: var(--color-success);
+        }
+
+        .test-option.incorrect-option {
+            background: var(--color-incorrect);
+            border-color: var(--color-danger);
+        }
+
+        .test-option input[type="radio"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .test-controls {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 20px;
+            border-top: 2px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 -30px -30px -30px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .test-score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .answer-feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .answer-feedback.correct {
+            background: var(--color-correct);
+            color: var(--color-success);
+        }
+
+        .answer-feedback.incorrect {
+            background: var(--color-incorrect);
+            color: var(--color-danger);
+        }
+
+        /* Modal for new user */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: var(--color-primary);
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #preview, #preview * {
+                visibility: visible;
+            }
+            #preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>📝 Multi-Paper MCQ System</h1>
+                <p>Multiple Papers for Different Classes & Subjects</p>
+            </div>
+            <div id="loginError" class="error-message"></div>
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>User ID <span class="required">*</span></label>
+                    <input type="text" id="loginUsername" placeholder="Enter user ID" required>
+                </div>
+                <div class="form-group">
+                    <label>Password <span class="required">*</span></label>
+                    <input type="password" id="loginPassword" placeholder="Enter password" required>
+                </div>
+
+                <!-- Student-specific fields -->
+                <div id="studentLoginFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Class/Grade <span class="required">*</span></label>
+                        <input type="text" id="studentClass" placeholder="e.g., 10th, Grade 12">
+                    </div>
+                    <div class="form-group">
+                        <label>Subject <span class="required">*</span></label>
+                        <input type="text" id="studentSubject" placeholder="e.g., Mathematics, Physics">
+                    </div>
+                    <div class="form-group">
+                        <label>Section <span class="required">*</span></label>
+                        <input type="text" id="studentSection" placeholder="e.g., A, B, General">
+                    </div>
+                </div>
+
+                <button type="submit" class="button button-primary button-full">Login</button>
+
+                <div style="margin-top: 15px; text-align: center;">
+                    <button type="button" class="button button-secondary button-full" onclick="showAddUserModal()">
+                        + Create New Student Account
+                    </button>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; font-size: 0.85rem;">
+                    <strong>Demo Admin:</strong><br>
+                    Username: admin<br>
+                    Password: 12345678<br><br>
+                    <strong>Demo Student:</strong><br>
+                    Username: student1<br>
+                    Password: 12345678<br>
+                    Class: 10th | Subject: Math | Section: A
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add New User Modal -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Student Account</h2>
+            </div>
+            <div id="addUserMessage" class="error-message"></div>
+            <form onsubmit="createNewUser(event)">
+                <div class="form-group">
+                    <label>Username <span class="required">*</span></label>
+                    <input type="text" id="newUsername" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password <span class="required">*</span></label>
+                    <input type="password" id="newPassword" placeholder="Enter password" required>
+                </div>
+                <div class="form-group">
+                    <label>Class/Grade <span class="required">*</span></label>
+                    <input type="text" id="newClass" placeholder="e.g., 10th, Grade 12" required>
+                </div>
+                <div class="form-group">
+                    <label>Subject <span class="required">*</span></label>
+                    <input type="text" id="newSubject" placeholder="e.g., Mathematics" required>
+                </div>
+                <div class="form-group">
+                    <label>Section <span class="required">*</span></label>
+                    <input type="text" id="newSection" placeholder="e.g., A, B" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="button button-success" style="flex: 1;">Create Account</button>
+                    <button type="button" class="button button-secondary" onclick="closeAddUserModal()" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Application -->
+    <div id="adminApp" class="app-container">
+        <div class="container">
+            <div class="user-info">
+                <div>
+                    <strong>👤 Admin Panel</strong> - Logged in as: <strong id="adminUsername"></strong>
+                    <span class="db-status">🗄️ Database Active</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+
+            <div id="adminMessage" class="success-message"></div>
+
+            <header>
+                <h1>📝 Multi-Paper MCQ Generator</h1>
+                <p>Create multiple question papers for different classes, subjects & sections</p>
+            </header>
+
+            <!-- Paper Selection for Admin -->
+            <div class="paper-selector">
+                <h3>📋 Select or Create Question Paper</h3>
+                <div class="main-grid">
+                    <div>
+                        <div class="form-group">
+                            <label>Existing Papers</label>
+                            <select id="adminPaperSelect" onchange="loadSelectedPaper()">
+                                <option value="">-- Create New Paper --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="currentPaperInfo" class="paper-info-display" style="display: none;">
+                        <strong>Current Paper:</strong>
+                        <div id="currentPaperDetails"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="questionCount">0</div>
+                    <div class="stat-label">MCQ Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalMarks">0</div>
+                    <div class="stat-label">Total Marks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPapers">0</div>
+                    <div class="stat-label">Total Papers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgMarks">0</div>
+                    <div class="stat-label">Avg Marks</div>
+                </div>
+            </div>
+
+            <div class="main-grid">
+                <div class="card">
+                    <h2>📄 Paper Information</h2>
+                    <div class="form-group">
+                        <label>Institute/School Name</label>
+                        <input type="text" id="instituteName" placeholder="Enter institute name">
+                    </div>
+                    <div class="form-group">
+                        <label>Paper Title</label>
+                        <input type="text" id="paperTitle" placeholder="Enter paper title">
+                    </div>
+                    <div class="form-group">
+                        <label>Subject/Course <span class="required">*</span></label>
+                        <input type="text" id="subject" placeholder="e.g., Mathematics, Physics" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Class/Grade <span class="required">*</span></label>
+                        <input type="text" id="classGrade" placeholder="e.g., 10th, Grade 12" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Section <span class="required">*</span></label>
+                        <input type="text" id="sectionName" placeholder="e.g., A, B, General" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Time Duration (mins)</label>
+                        <input type="number" id="duration" placeholder="e.g., 60">
+                    </div>
+                    <div class="form-group">
+                        <label>Instructions (Optional)</label>
+                        <textarea id="instructions" placeholder="Enter exam instructions..."></textarea>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>➕ Add MCQ Question</h2>
+                    <div class="form-group">
+                        <label>Question Category</label>
+                        <select id="questionCategory">
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Question Text <span class="required">*</span></label>
+                        <textarea id="questionText" placeholder="Enter your MCQ question..."></textarea>
+                    </div>
+
+                    <div class="image-upload-section">
+                        <label>📷 Attach Equation/Diagram Image (Optional)</label>
+                        <input type="file" id="questionImage" accept="image/*">
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Option A <span class="required">*</span></label>
+                        <input type="text" id="optionA" placeholder="Enter option A">
+                    </div>
+                    <div class="form-group">
+                        <label>Option B <span class="required">*</span></label>
+                        <input type="text" id="optionB" placeholder="Enter option B">
+                    </div>
+                    <div class="form-group">
+                        <label>Option C <span class="required">*</span></label>
+                        <input type="text" id="optionC" placeholder="Enter option C">
+                    </div>
+                    <div class="form-group">
+                        <label>Option D <span class="required">*</span></label>
+                        <input type="text" id="optionD" placeholder="Enter option D">
+                    </div>
+                    <div class="form-group">
+                        <label>Correct Answer <span class="required">*</span></label>
+                        <select id="correctAnswer">
+                            <option value="">Select correct option</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Marks</label>
+                        <input type="number" id="marks" value="1" min="0">
+                    </div>
+                    <div class="button-group">
+                        <button class="button button-primary" onclick="addQuestion()">Add to Database</button>
+                        <button class="button button-secondary" onclick="clearForm()">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-grid">
+                <div class="card">
+                    <h2>📋 Questions List (Current Paper)</h2>
+                    <div id="questionsList"></div>
+                </div>
+
+                <div class="card">
+                    <h2>👁️ Question Paper Preview</h2>
+                    <div id="preview">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👈</div>
+                            <p>Add questions to see preview here</p>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="button button-primary" onclick="printPaper()">🖨️ Print Paper</button>
+                        <button class="button button-primary" onclick="startTest()">📝 Preview Test</button>
+                        <button class="button button-danger" onclick="clearCurrentPaper()">🗑️ Clear Paper</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Application -->
+    <div id="studentApp" class="app-container">
+        <div class="container">
+            <div class="user-info">
+                <div>
+                    <strong>📚 Student Portal</strong> - <strong id="studentUsername"></strong>
+                    <div class="user-details" id="studentDetails"></div>
+                    <span class="db-status">🗄️ Database Connected</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+
+            <header>
+                <h1>📝 Your MCQ Test Paper</h1>
+                <p>Answer all questions and submit to see your score</p>
+            </header>
+
+            <div id="studentTestContent" class="card" style="max-width: 900px; margin: 0 auto;">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <p>Loading your test paper from database...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Modal (for admin preview) -->
+    <div id="testModal" class="test-modal">
+        <div class="test-modal-content">
+            <div class="test-header">
+                <h2>📝 MCQ Test Preview</h2>
+                <p>Select the correct option for each question</p>
+            </div>
+            <div id="testQuestions"></div>
+            <div class="test-controls">
+                <div class="test-score" id="testScore"></div>
+                <div>
+                    <button class="button button-primary" onclick="submitTest()">Submit Test</button>
+                    <button class="button button-secondary" onclick="closeTest()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DATABASE SETUP ====================
+        let db;
+        const DB_NAME = 'MultiPaperMCQDB';
+        const DB_VERSION = 2;
+        const QUESTIONS_STORE = 'questions';
+        const PAPERS_STORE = 'papers';
+        const USERS_STORE = 'users';
+
+        function initDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = () => reject('Database failed to open');
+
+                request.onsuccess = () => {
+                    db = request.result;
+                    console.log('✅ Database opened successfully');
+                    resolve(db);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+
+                    // Questions store with composite index
+                    if (!db.objectStoreNames.contains(QUESTIONS_STORE)) {
+                        const questionsStore = db.createObjectStore(QUESTIONS_STORE, { keyPath: 'id', autoIncrement: true });
+                        questionsStore.createIndex('paperId', 'paperId', { unique: false });
+                        questionsStore.createIndex('category', 'category', { unique: false });
+                        console.log('✅ Questions store created');
+                    }
+
+                    // Papers store
+                    if (!db.objectStoreNames.contains(PAPERS_STORE)) {
+                        const papersStore = db.createObjectStore(PAPERS_STORE, { keyPath: 'id', autoIncrement: true });
+                        papersStore.createIndex('subject', 'subject', { unique: false });
+                        papersStore.createIndex('classGrade', 'classGrade', { unique: false });
+                        papersStore.createIndex('section', 'section', { unique: false });
+                        papersStore.createIndex('composite', ['subject', 'classGrade', 'section'], { unique: false });
+                        console.log('✅ Papers store created');
+                    }
+
+                    // Users store
+                    if (!db.objectStoreNames.contains(USERS_STORE)) {
+                        const usersStore = db.createObjectStore(USERS_STORE, { keyPath: 'username' });
+                        usersStore.createIndex('role', 'role', { unique: false });
+                        console.log('✅ Users store created');
+
+                        // Add default users
+                        usersStore.add({ username: 'admin', password: '12345678', role: 'admin' });
+                        usersStore.add({ 
+                            username: 'student1', 
+                            password: '12345678', 
+                            role: 'student',
+                            classGrade: '10th',
+                            subject: 'Math',
+                            section: 'A'
+                        });
+                    }
+                };
+            });
+        }
+
+        // Paper operations
+        function createOrUpdatePaper(paperData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([PAPERS_STORE], 'readwrite');
+                const store = transaction.objectStore(PAPERS_STORE);
+
+                if (paperData.id) {
+                    const request = store.put(paperData);
+                    request.onsuccess = () => resolve(paperData.id);
+                } else {
+                    const request = store.add(paperData);
+                    request.onsuccess = () => resolve(request.result);
+                }
+
+                transaction.onerror = () => reject('Error saving paper');
+            });
+        }
+
+        function getAllPapers() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([PAPERS_STORE], 'readonly');
+                const store = transaction.objectStore(PAPERS_STORE);
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject('Error retrieving papers');
+            });
+        }
+
+        function getPapersByFilter(subject, classGrade, section) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([PAPERS_STORE], 'readonly');
+                const store = transaction.objectStore(PAPERS_STORE);
+                const index = store.index('composite');
+                const request = index.getAll([subject, classGrade, section]);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject('Error retrieving papers by filter');
+            });
+        }
+
+        // Question operations
+        function addQuestionToDB(question) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([QUESTIONS_STORE], 'readwrite');
+                const store = transaction.objectStore(QUESTIONS_STORE);
+                const request = store.add(question);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject('Error adding question');
+            });
+        }
+
+        function getQuestionsByPaperId(paperId) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([QUESTIONS_STORE], 'readonly');
+                const store = transaction.objectStore(QUESTIONS_STORE);
+                const index = store.index('paperId');
+                const request = index.getAll(paperId);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject('Error retrieving questions');
+            });
+        }
+
+        function deleteQuestionFromDB(id) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([QUESTIONS_STORE], 'readwrite');
+                const store = transaction.objectStore(QUESTIONS_STORE);
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject('Error deleting question');
+            });
+        }
+
+        function clearQuestionsByPaperId(paperId) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([QUESTIONS_STORE], 'readwrite');
+                const store = transaction.objectStore(QUESTIONS_STORE);
+                const index = store.index('paperId');
+                const request = index.openCursor(IDBKeyRange.only(paperId));
+
+                request.onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor) {
+                        cursor.delete();
+                        cursor.continue();
+                    } else {
+                        resolve();
+                    }
+                };
+                request.onerror = () => reject('Error clearing questions');
+            });
+        }
+
+        function verifyAnswerFromDB(questionId, selectedAnswer) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([QUESTIONS_STORE], 'readonly');
+                const store = transaction.objectStore(QUESTIONS_STORE);
+                const request = store.get(questionId);
+                request.onsuccess = () => {
+                    const question = request.result;
+                    if (question) {
+                        resolve({
+                            isCorrect: question.correctAnswer === selectedAnswer,
+                            correctAnswer: question.correctAnswer,
+                            correctText: question.options[question.correctAnswer],
+                            marks: question.marks
+                        });
+                    } else {
+                        reject('Question not found');
+                    }
+                };
+                request.onerror = () => reject('Error verifying answer');
+            });
+        }
+
+        // User operations
+        function addUserToDB(userData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([USERS_STORE], 'readwrite');
+                const store = transaction.objectStore(USERS_STORE);
+                const request = store.add(userData);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject('Username already exists');
+            });
+        }
+
+        function getUserFromDB(username) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([USERS_STORE], 'readonly');
+                const store = transaction.objectStore(USERS_STORE);
+                const request = store.get(username);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject('Error retrieving user');
+            });
+        }
+
+        // ==================== APPLICATION STATE ====================
+        let currentUser = null;
+        let currentPaper = null;
+        let questions = [];
+        let allPapers = [];
+        let currentImageData = null;
+        let testSubmitted = false;
+
+        // ==================== INITIALIZATION ====================
+        window.onload = async function() {
+            try {
+                await initDatabase();
+
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    showApp(currentUser.role);
+                }
+
+                // Show/hide student fields based on username input
+                document.getElementById('loginUsername').addEventListener('input', function() {
+                    const username = this.value.toLowerCase();
+                    const studentFields = document.getElementById('studentLoginFields');
+                    if (username !== 'admin' && username.length > 0) {
+                        studentFields.style.display = 'block';
+                    } else {
+                        studentFields.style.display = 'none';
+                    }
+                });
+            } catch (error) {
+                console.error('Database initialization error:', error);
+                alert('Database initialization failed. Please refresh the page.');
+            }
+        };
+
+        // ==================== USER MANAGEMENT ====================
+        async function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            try {
+                const user = await getUserFromDB(username);
+
+                if (user && user.password === password) {
+                    if (user.role === 'student') {
+                        // For students, verify or update their class/subject/section
+                        const studentClass = document.getElementById('studentClass').value.trim();
+                        const studentSubject = document.getElementById('studentSubject').value.trim();
+                        const studentSection = document.getElementById('studentSection').value.trim();
+
+                        if (!studentClass || !studentSubject || !studentSection) {
+                            errorDiv.textContent = '❌ Please enter your Class, Subject, and Section';
+                            errorDiv.style.display = 'block';
+                            return;
+                        }
+
+                        currentUser = { 
+                            username: username, 
+                            role: user.role,
+                            classGrade: studentClass,
+                            subject: studentSubject,
+                            section: studentSection
+                        };
+                    } else {
+                        currentUser = { username: username, role: user.role };
+                    }
+
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showApp(currentUser.role);
+                    errorDiv.style.display = 'none';
+                } else {
+                    errorDiv.textContent = '❌ Invalid credentials. Please try again.';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = '❌ Login error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function showAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'block';
+        }
+
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'none';
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('newClass').value = '';
+            document.getElementById('newSubject').value = '';
+            document.getElementById('newSection').value = '';
+            document.getElementById('addUserMessage').style.display = 'none';
+        }
+
+        async function createNewUser(event) {
+            event.preventDefault();
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const classGrade = document.getElementById('newClass').value.trim();
+            const subject = document.getElementById('newSubject').value.trim();
+            const section = document.getElementById('newSection').value.trim();
+            const msgDiv = document.getElementById('addUserMessage');
+
+            try {
+                await addUserToDB({
+                    username: username,
+                    password: password,
+                    role: 'student',
+                    classGrade: classGrade,
+                    subject: subject,
+                    section: section
+                });
+
+                msgDiv.className = 'success-message';
+                msgDiv.textContent = '✅ Account created successfully! You can now login.';
+                msgDiv.style.display = 'block';
+
+                setTimeout(() => {
+                    closeAddUserModal();
+                }, 2000);
+            } catch (error) {
+                msgDiv.className = 'error-message';
+                msgDiv.textContent = '❌ Username already exists. Please choose another.';
+                msgDiv.style.display = 'block';
+            }
+        }
+
+        async function showApp(role) {
+            document.getElementById('loginScreen').style.display = 'none';
+
+            if (role === 'admin') {
+                document.getElementById('adminApp').style.display = 'block';
+                document.getElementById('adminUsername').textContent = currentUser.username;
+                await loadAllPapers();
+                await updatePaperDropdown();
+            } else if (role === 'student') {
+                document.getElementById('studentApp').style.display = 'block';
+                document.getElementById('studentUsername').textContent = currentUser.username;
+                document.getElementById('studentDetails').textContent = 
+                    `Class: ${currentUser.classGrade} | Subject: ${currentUser.subject} | Section: ${currentUser.section}`;
+                await displayStudentTest();
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser');
+                currentUser = null;
+                currentPaper = null;
+                questions = [];
+                document.getElementById('adminApp').style.display = 'none';
+                document.getElementById('studentApp').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('studentClass').value = '';
+                document.getElementById('studentSubject').value = '';
+                document.getElementById('studentSection').value = '';
+            }
+        }
+
+        // ==================== ADMIN FUNCTIONS ====================
+        async function loadAllPapers() {
+            try {
+                allPapers = await getAllPapers();
+                document.getElementById('totalPapers').textContent = allPapers.length;
+            } catch (error) {
+                console.error('Error loading papers:', error);
+            }
+        }
+
+        async function updatePaperDropdown() {
+            const select = document.getElementById('adminPaperSelect');
+            select.innerHTML = '<option value="">-- Create New Paper --</option>';
+
+            allPapers.forEach(paper => {
+                const option = document.createElement('option');
+                option.value = paper.id;
+                option.textContent = `${paper.subject} - ${paper.classGrade} - ${paper.section}`;
+                select.appendChild(option);
+            });
+        }
+
+        async function loadSelectedPaper() {
+            const paperId = parseInt(document.getElementById('adminPaperSelect').value);
+
+            if (!paperId) {
+                currentPaper = null;
+                questions = [];
+                document.getElementById('currentPaperInfo').style.display = 'none';
+                clearPaperForm();
+                updateDisplay();
+                return;
+            }
+
+            const paper = allPapers.find(p => p.id === paperId);
+            if (paper) {
+                currentPaper = paper;
+                document.getElementById('instituteName').value = paper.instituteName || '';
+                document.getElementById('paperTitle').value = paper.paperTitle || '';
+                document.getElementById('subject').value = paper.subject || '';
+                document.getElementById('classGrade').value = paper.classGrade || '';
+                document.getElementById('sectionName').value = paper.section || '';
+                document.getElementById('duration').value = paper.duration || '';
+                document.getElementById('instructions').value = paper.instructions || '';
+
+                document.getElementById('currentPaperInfo').style.display = 'block';
+                document.getElementById('currentPaperDetails').innerHTML = 
+                    `${paper.subject} | ${paper.classGrade} | Section: ${paper.section}`;
+
+                questions = await getQuestionsByPaperId(paperId);
+                updateDisplay();
+            }
+        }
+
+        function clearPaperForm() {
+            document.getElementById('instituteName').value = '';
+            document.getElementById('paperTitle').value = '';
+            document.getElementById('subject').value = '';
+            document.getElementById('classGrade').value = '';
+            document.getElementById('sectionName').value = '';
+            document.getElementById('duration').value = '';
+            document.getElementById('instructions').value = '';
+        }
+
+        if (document.getElementById('questionImage')) {
+            document.getElementById('questionImage').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        currentImageData = event.target.result;
+                        document.getElementById('imagePreview').innerHTML = 
+                            `<img src="${currentImageData}" alt="Question Image">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        async function addQuestion() {
+            const subject = document.getElementById('subject').value.trim();
+            const classGrade = document.getElementById('classGrade').value.trim();
+            const section = document.getElementById('sectionName').value.trim();
+
+            if (!subject || !classGrade || !section) {
+                alert('Please fill in Subject, Class, and Section first!');
+                return;
+            }
+
+            const questionText = document.getElementById('questionText').value.trim();
+            const optionA = document.getElementById('optionA').value.trim();
+            const optionB = document.getElementById('optionB').value.trim();
+            const optionC = document.getElementById('optionC').value.trim();
+            const optionD = document.getElementById('optionD').value.trim();
+            const correctAnswer = document.getElementById('correctAnswer').value;
+            const marks = parseInt(document.getElementById('marks').value) || 1;
+            const category = document.getElementById('questionCategory').value || 'General';
+
+            if (!questionText || !optionA || !optionB || !optionC || !optionD || !correctAnswer) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            try {
+                // Create or update paper
+                if (!currentPaper) {
+                    const paperData = {
+                        instituteName: document.getElementById('instituteName').value || '',
+                        paperTitle: document.getElementById('paperTitle').value || '',
+                        subject: subject,
+                        classGrade: classGrade,
+                        section: section,
+                        duration: document.getElementById('duration').value || '',
+                        instructions: document.getElementById('instructions').value || '',
+                        createdAt: new Date().toISOString()
+                    };
+                    const paperId = await createOrUpdatePaper(paperData);
+                    paperData.id = paperId;
+                    currentPaper = paperData;
+                    await loadAllPapers();
+                    await updatePaperDropdown();
+                    document.getElementById('adminPaperSelect').value = paperId;
+                }
+
+                const question = {
+                    paperId: currentPaper.id,
+                    text: questionText,
+                    options: { A: optionA, B: optionB, C: optionC, D: optionD },
+                    correctAnswer: correctAnswer,
+                    marks: marks,
+                    category: category,
+                    image: currentImageData,
+                    createdAt: new Date().toISOString()
+                };
+
+                await addQuestionToDB(question);
+                showAdminMessage('✅ Question added to database successfully!');
+                questions = await getQuestionsByPaperId(currentPaper.id);
+                updateDisplay();
+                clearForm();
+            } catch (error) {
+                console.error('Error adding question:', error);
+                alert('Error adding question to database');
+            }
+        }
+
+        function showAdminMessage(message) {
+            const msgDiv = document.getElementById('adminMessage');
+            msgDiv.textContent = message;
+            msgDiv.style.display = 'block';
+            setTimeout(() => msgDiv.style.display = 'none', 3000);
+        }
+
+        function clearForm() {
+            document.getElementById('questionText').value = '';
+            document.getElementById('optionA').value = '';
+            document.getElementById('optionB').value = '';
+            document.getElementById('optionC').value = '';
+            document.getElementById('optionD').value = '';
+            document.getElementById('correctAnswer').value = '';
+            document.getElementById('marks').value = '1';
+            if (document.getElementById('questionImage')) {
+                document.getElementById('questionImage').value = '';
+                document.getElementById('imagePreview').innerHTML = '';
+            }
+            currentImageData = null;
+        }
+
+        async function deleteQuestion(id) {
+            if (confirm('Delete this question from the database?')) {
+                try {
+                    await deleteQuestionFromDB(id);
+                    showAdminMessage('✅ Question deleted');
+                    questions = await getQuestionsByPaperId(currentPaper.id);
+                    updateDisplay();
+                } catch (error) {
+                    alert('Error deleting question');
+                }
+            }
+        }
+
+        function updateDisplay() {
+            updateStats();
+            updateQuestionsList();
+            updatePreview();
+        }
+
+        function updateStats() {
+            const totalMarks = questions.reduce((sum, q) => sum + q.marks, 0);
+            const avgMarks = questions.length > 0 ? (totalMarks / questions.length).toFixed(1) : 0;
+
+            document.getElementById('questionCount').textContent = questions.length;
+            document.getElementById('totalMarks').textContent = totalMarks;
+            document.getElementById('avgMarks').textContent = avgMarks;
+        }
+
+        function updateQuestionsList() {
+            const container = document.getElementById('questionsList');
+            if (questions.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center;">No questions in this paper yet</p>';
+                return;
+            }
+
+            container.innerHTML = questions.map((q, index) => `
+                <div class="question-item">
+                    <div class="question-header">
+                        <span><strong>Q${index + 1}.</strong> ${q.category} <span style="color: #999; font-size: 0.85rem;">(ID: ${q.id})</span></span>
+                        <button class="delete-btn" onclick="deleteQuestion(${q.id})">Delete</button>
+                    </div>
+                    <div class="question-text">${q.text}</div>
+                    ${q.image ? '<div style="margin: 10px 0;"><img src="' + q.image + '" style="max-width: 150px; max-height: 100px; border-radius: 4px;"></div>' : ''}
+                    <div class="options-list">
+                        A) ${q.options.A}<br>
+                        B) ${q.options.B}<br>
+                        C) ${q.options.C}<br>
+                        D) ${q.options.D}
+                    </div>
+                    <div class="correct-answer">✓ Correct: ${q.correctAnswer}</div>
+                    <div style="margin-top: 8px; color: #666; font-size: 0.85rem;">Marks: ${q.marks}</div>
+                </div>
+            `).join('');
+        }
+
+        function updatePreview() {
+            const preview = document.getElementById('preview');
+            if (questions.length === 0 || !currentPaper) {
+                preview.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👈</div>
+                        <p>Add questions to see preview here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalMarks = questions.reduce((sum, q) => sum + q.marks, 0);
+
+            let html = `
+                <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+                    <h2 style="margin: 0; font-size: 1.8rem;">${currentPaper.instituteName || '[Institute Name]'}</h2>
+                    <h3 style="margin: 10px 0; font-size: 1.3rem;">${currentPaper.paperTitle || '[Paper Title]'}</h3>
+                    <div style="display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.95rem;">
+                        <div><strong>Subject:</strong> ${currentPaper.subject}</div>
+                        <div><strong>Class:</strong> ${currentPaper.classGrade}</div>
+                        <div><strong>Section:</strong> ${currentPaper.section}</div>
+                        <div><strong>Time:</strong> ${currentPaper.duration || 'N/A'} mins</div>
+                        <div><strong>Total Marks:</strong> ${totalMarks}</div>
+                    </div>
+                </div>
+            `;
+
+            if (currentPaper.instructions) {
+                html += `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>Instructions:</strong><br>
+                        ${currentPaper.instructions}
+                    </div>
+                `;
+            }
+
+            questions.forEach((q, index) => {
+                html += `
+                    <div style="margin-bottom: 25px;">
+                        <p style="font-weight: 500; margin-bottom: 10px;">
+                            <strong>Q${index + 1}.</strong> ${q.text} 
+                            <span style="float: right;">[${q.marks} mark${q.marks > 1 ? 's' : ''}]</span>
+                        </p>
+                        ${q.image ? '<div style="margin: 10px 0;"><img src="' + q.image + '" style="max-width: 300px; max-height: 200px; border-radius: 4px; border: 1px solid #ddd;"></div>' : ''}
+                        <div style="margin-left: 20px; line-height: 1.8;">
+                            <div>A) ${q.options.A}</div>
+                            <div>B) ${q.options.B}</div>
+                            <div>C) ${q.options.C}</div>
+                            <div>D) ${q.options.D}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            preview.innerHTML = html;
+        }
+
+        async function clearCurrentPaper() {
+            if (!currentPaper) {
+                alert('No paper selected');
+                return;
+            }
+
+            if (confirm('Clear all questions from this paper? This cannot be undone.')) {
+                try {
+                    await clearQuestionsByPaperId(currentPaper.id);
+                    showAdminMessage('✅ Paper cleared successfully');
+                    questions = [];
+                    updateDisplay();
+                } catch (error) {
+                    alert('Error clearing paper');
+                }
+            }
+        }
+
+        // ==================== STUDENT FUNCTIONS ====================
+        async function displayStudentTest() {
+            const container = document.getElementById('studentTestContent');
+
+            try {
+                // Find papers matching student's class, subject, and section
+                const matchingPapers = await getPapersByFilter(
+                    currentUser.subject,
+                    currentUser.classGrade,
+                    currentUser.section
+                );
+
+                if (matchingPapers.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📝</div>
+                            <p>No test paper available for:</p>
+                            <p><strong>Class:</strong> ${currentUser.classGrade} | 
+                               <strong>Subject:</strong> ${currentUser.subject} | 
+                               <strong>Section:</strong> ${currentUser.section}</p>
+                            <p style="margin-top: 15px;">Please contact your administrator.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Use the first matching paper
+                const paper = matchingPapers[0];
+                questions = await getQuestionsByPaperId(paper.id);
+
+                if (questions.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📝</div>
+                            <p>No questions in your test paper yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const totalMarks = questions.reduce((sum, q) => sum + q.marks, 0);
+
+                let html = `
+                    <div class="test-header">
+                        <h2>${paper.instituteName || 'Test Paper'}</h2>
+                        <p>${paper.paperTitle || ''}</p>
+                        <div style="margin-top: 10px; font-size: 0.9rem;">
+                            Subject: ${paper.subject} | Class: ${paper.classGrade} | Section: ${paper.section}<br>
+                            Time: ${paper.duration || 'N/A'} mins | Total Marks: ${totalMarks}
+                        </div>
+                    </div>
+                `;
+
+                if (paper.instructions) {
+                    html += `
+                        <div style="background: var(--color-warning); padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                            <strong>Instructions:</strong><br>
+                            ${paper.instructions}
+                        </div>
+                    `;
+                }
+
+                questions.forEach((q, index) => {
+                    html += `
+                        <div class="test-question" id="studentQuestion${index}" style="margin-bottom: 20px;">
+                            <div class="test-question-text">
+                                <strong>Question ${index + 1}:</strong> ${q.text}
+                                <span style="float: right; color: #666;">[${q.marks} mark${q.marks > 1 ? 's' : ''}]</span>
+                            </div>
+                            ${q.image ? '<div class="test-question-image"><img src="' + q.image + '" alt="Question Image"></div>' : ''}
+                            <div class="test-options">
+                                ${['A', 'B', 'C', 'D'].map(option => `
+                                    <label class="test-option" id="studentOption${index}${option}">
+                                        <input type="radio" name="studentQuestion${index}" value="${option}" 
+                                               data-question-id="${q.id}"
+                                               onchange="selectStudentOption(${index}, '${option}')">
+                                        <span>${option}) ${q.options[option]}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                            <div id="studentFeedback${index}" class="answer-feedback" style="display: none;"></div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                    <div style="position: sticky; bottom: 0; background: white; padding: 20px 0; border-top: 2px solid var(--color-border); margin-top: 30px;">
+                        <div id="studentScore" class="test-score" style="margin-bottom: 15px;"></div>
+                        <button class="button button-primary button-full" onclick="submitStudentTest()">
+                            Submit Test (Verify with Database)
+                        </button>
+                    </div>
+                `;
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading test:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <p>Error loading test from database. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function selectStudentOption(questionIndex, option) {
+            const options = document.querySelectorAll(`input[name="studentQuestion${questionIndex}"]`);
+            options.forEach(opt => {
+                const label = opt.parentElement;
+                label.classList.remove('selected');
+                if (opt.checked) {
+                    label.classList.add('selected');
+                }
+            });
+        }
+
+        async function submitStudentTest() {
+            let correctCount = 0;
+            let totalScore = 0;
+            let earnedScore = 0;
+
+            for (let index = 0; index < questions.length; index++) {
+                const selectedOption = document.querySelector(`input[name="studentQuestion${index}"]:checked`);
+                const questionDiv = document.getElementById(`studentQuestion${index}`);
+                const feedback = document.getElementById(`studentFeedback${index}`);
+
+                const question = questions[index];
+                totalScore += question.marks;
+
+                if (!selectedOption) {
+                    feedback.textContent = '⚠️ No answer selected';
+                    feedback.className = 'answer-feedback incorrect';
+                    feedback.style.display = 'block';
+                    continue;
+                }
+
+                const selectedValue = selectedOption.value;
+                const questionId = parseInt(selectedOption.dataset.questionId);
+
+                try {
+                    const result = await verifyAnswerFromDB(questionId, selectedValue);
+
+                    const selectedLabel = document.getElementById(`studentOption${index}${selectedValue}`);
+
+                    if (result.isCorrect) {
+                        correctCount++;
+                        earnedScore += result.marks;
+                        questionDiv.classList.add('correct');
+                        selectedLabel.classList.add('correct-option');
+                        feedback.textContent = '✓ Correct! (Verified from database)';
+                        feedback.className = 'answer-feedback correct';
+                    } else {
+                        questionDiv.classList.add('incorrect');
+                        selectedLabel.classList.add('incorrect-option');
+                        const correctLabel = document.getElementById(`studentOption${index}${result.correctAnswer}`);
+                        correctLabel.classList.add('correct-option');
+                        feedback.textContent = `✗ Incorrect. Correct: ${result.correctAnswer}) ${result.correctText}`;
+                        feedback.className = 'answer-feedback incorrect';
+                    }
+
+                    feedback.style.display = 'block';
+
+                    const allOptions = document.querySelectorAll(`input[name="studentQuestion${index}"]`);
+                    allOptions.forEach(opt => opt.disabled = true);
+
+                } catch (error) {
+                    console.error('Error verifying answer:', error);
+                    feedback.textContent = '❌ Error verifying answer';
+                    feedback.className = 'answer-feedback incorrect';
+                    feedback.style.display = 'block';
+                }
+            }
+
+            const percentage = totalScore > 0 ? ((earnedScore / totalScore) * 100).toFixed(1) : 0;
+            document.getElementById('studentScore').innerHTML = 
+                `<strong>Your Score:</strong> ${earnedScore}/${totalScore} marks (${percentage}%) - ${correctCount}/${questions.length} correct answers`;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==================== ADMIN TEST PREVIEW ====================
+        function startTest() {
+            if (questions.length === 0) {
+                alert('Please add some questions first');
+                return;
+            }
+
+            testSubmitted = false;
+            const modal = document.getElementById('testModal');
+            const testQuestions = document.getElementById('testQuestions');
+
+            let html = '';
+            questions.forEach((q, index) => {
+                html += `
+                    <div class="test-question" id="testQuestion${index}">
+                        <div class="test-question-text">
+                            <strong>Question ${index + 1}:</strong> ${q.text}
+                            <span style="float: right; color: #666;">[${q.marks} mark${q.marks > 1 ? 's' : ''}]</span>
+                        </div>
+                        ${q.image ? '<div class="test-question-image"><img src="' + q.image + '" alt="Question Image"></div>' : ''}
+                        <div class="test-options">
+                            ${['A', 'B', 'C', 'D'].map(option => `
+                                <label class="test-option" id="testOption${index}${option}">
+                                    <input type="radio" name="question${index}" value="${option}" 
+                                           data-question-id="${q.id}"
+                                           onchange="selectOption(${index}, '${option}')">
+                                    <span>${option}) ${q.options[option]}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <div id="feedback${index}" class="answer-feedback" style="display: none;"></div>
+                    </div>
+                `;
+            });
+
+            testQuestions.innerHTML = html;
+            document.getElementById('testScore').textContent = '';
+            modal.style.display = 'block';
+        }
+
+        function selectOption(questionIndex, option) {
+            if (testSubmitted) return;
+
+            const options = document.querySelectorAll(`input[name="question${questionIndex}"]`);
+            options.forEach(opt => {
+                const label = opt.parentElement;
+                label.classList.remove('selected');
+                if (opt.checked) {
+                    label.classList.add('selected');
+                }
+            });
+        }
+
+        async function submitTest() {
+            if (testSubmitted) {
+                alert('Test already submitted!');
+                return;
+            }
+
+            let correctCount = 0;
+            let totalScore = 0;
+            let earnedScore = 0;
+
+            for (let index = 0; index < questions.length; index++) {
+                const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                const questionDiv = document.getElementById(`testQuestion${index}`);
+                const feedback = document.getElementById(`feedback${index}`);
+
+                const question = questions[index];
+                totalScore += question.marks;
+
+                if (!selectedOption) {
+                    feedback.textContent = '⚠️ No answer selected';
+                    feedback.className = 'answer-feedback incorrect';
+                    feedback.style.display = 'block';
+                    continue;
+                }
+
+                const selectedValue = selectedOption.value;
+                const questionId = parseInt(selectedOption.dataset.questionId);
+
+                try {
+                    const result = await verifyAnswerFromDB(questionId, selectedValue);
+
+                    const selectedLabel = document.getElementById(`testOption${index}${selectedValue}`);
+
+                    if (result.isCorrect) {
+                        correctCount++;
+                        earnedScore += result.marks;
+                        questionDiv.classList.add('correct');
+                        selectedLabel.classList.add('correct-option');
+                        feedback.textContent = '✓ Correct!';
+                        feedback.className = 'answer-feedback correct';
+                    } else {
+                        questionDiv.classList.add('incorrect');
+                        selectedLabel.classList.add('incorrect-option');
+                        const correctLabel = document.getElementById(`testOption${index}${result.correctAnswer}`);
+                        correctLabel.classList.add('correct-option');
+                        feedback.textContent = `✗ Incorrect. Correct: ${result.correctAnswer}) ${result.correctText}`;
+                        feedback.className = 'answer-feedback incorrect';
+                    }
+
+                    feedback.style.display = 'block';
+                } catch (error) {
+                    console.error('Error verifying answer:', error);
+                }
+            }
+
+            const percentage = totalScore > 0 ? ((earnedScore / totalScore) * 100).toFixed(1) : 0;
+            document.getElementById('testScore').innerHTML = 
+                `Score: ${earnedScore}/${totalScore} (${percentage}%) - ${correctCount}/${questions.length} correct`;
+
+            testSubmitted = true;
+        }
+
+        function closeTest() {
+            document.getElementById('testModal').style.display = 'none';
+        }
+
+        function printPaper() {
+            if (questions.length === 0) {
+                alert('Please add some questions first');
+                return;
+            }
+            window.print();
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('testModal');
+            const addUserModal = document.getElementById('addUserModal');
+            if (event.target === modal) {
+                closeTest();
+            }
+            if (event.target === addUserModal) {
+                closeAddUserModal();
+            }
+        }
+    </script>
+</body>
+</html>
