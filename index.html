@@ -1452,6 +1452,28 @@
             const correctAnswer = document.getElementById('correctAnswer').value;
             const marks = parseInt(document.getElementById('marks').value) || 1;
             const category = document.getElementById('questionCategory').value || 'General';
+            async function saveQuestionToSheet(question) {
+  await fetch("YOUR_WEB_APP_URL", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sheet: "Questions",
+      paperId: question.paperId,
+      subject: question.subject,
+      class: question.classGrade,
+      section: question.section,
+      question: question.text,
+      optionA: question.options.A,
+      optionB: question.options.B,
+      optionC: question.options.C,
+      optionD: question.options.D,
+      correct: question.correctAnswer,
+      marks: question.marks,
+      image: question.image || "",
+      createdAt: new Date().toISOString()
+    })
+  });
+}
 
             if (!questionText || !optionA || !optionB || !optionC || !optionD || !correctAnswer) {
                 alert('Please fill in all required fields');
@@ -1500,6 +1522,18 @@
                 alert('Error adding question to database');
             }
         }
+fetch("YOUR_WEB_APP_URL", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    sheet: "Students",
+    username: currentUser.username,
+    class: currentUser.classGrade,
+    subject: currentUser.subject,
+    section: currentUser.section,
+    loginTime: new Date().toISOString()
+  })
+});
 
         function showAdminMessage(message) {
             const msgDiv = document.getElementById('adminMessage');
@@ -1759,7 +1793,7 @@
                 `;
             }
         }
-
+YOUR_WEB_APP_URL="https://script.google.com/macros/s/AKfycbybNvB4FgBVoMD7BmsWyooNEMeYDRablfkpC20Fo9woyYiV1aiSufKnGhtH5nzKMY0yug/exec";
         function selectStudentOption(questionIndex, option) {
             const options = document.querySelectorAll(`input[name="studentQuestion${questionIndex}"]`);
             options.forEach(opt => {
@@ -1893,6 +1927,20 @@
                 alert('Test already submitted!');
                 return;
             }
+fetch("YOUR_WEB_APP_URL", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    sheet: "Responses",
+    username: currentUser.username,
+    paperId: currentPaper.id,
+    questionId: q.id,
+    selectedAnswer: selected,
+    isCorrect: result.isCorrect,
+    marks: result.isCorrect ? result.marks : 0,
+    submittedAt: new Date().toISOString()
+  })
+});
 
             let correctCount = 0;
             let totalScore = 0;
