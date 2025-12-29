@@ -1003,6 +1003,8 @@
         const QUESTIONS_STORE = 'questions';
         const PAPERS_STORE = 'papers';
         const USERS_STORE = 'users';
+const DBVERSION = 3;                 // bump version so onupgradeneeded runs again
+const ACCESSSTORE = 'access';        // new store name
 
         function initDatabase() {
             return new Promise((resolve, reject) => {
@@ -1026,6 +1028,22 @@
                         questionsStore.createIndex('category', 'category', { unique: false });
                         console.log('✅ Questions store created');
                     }
+// Access store (paper permissions per student)
+if (!db.objectStoreNames.contains(ACCESSSTORE)) {
+  const accessStore = db.createObjectStore(ACCESSSTORE, {
+    keyPath: 'id',
+    autoIncrement: true
+  });
+
+  // Query helpers
+  accessStore.createIndex('paperId', 'paperId', { unique: false });
+  accessStore.createIndex('studentUsername', 'studentUsername', { unique: false });
+
+  // Prevent duplicates for same student+paper (recommended)
+  accessStore.createIndex('studentPaper', ['studentUsername', 'paperId'], { unique: true });
+
+  console.log('Access store created');
+}
 
                     // Papers store
                     if (!db.objectStoreNames.contains(PAPERS_STORE)) {
@@ -1036,7 +1054,7 @@
                         papersStore.createIndex('composite', ['subject', 'classGrade', 'section'], { unique: false });
                         console.log('✅ Papers store created');
                     }
-
+                        
                     // Users store
                     if (!db.objectStoreNames.contains(USERS_STORE)) {
                         const usersStore = db.createObjectStore(USERS_STORE, { keyPath: 'username' });
@@ -1170,6 +1188,46 @@
                 request.onerror = () => reject('Error verifying answer');
             });
         }
+        //===========Access=============
+function setAccess(studentUsername, paperId, allowed) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(ACCESSSTORE, 'readwrite');
+    const store = tx.objectStore(ACCESSSTORE);
+    const idx = store.index('studentPaper');
+
+    const getReq = idx.get([studentUsername, paperId]);
+
+    getReq.onsuccess = () => {
+      const existing = getReq.result;
+      const row = {
+        ...(existing || {}),
+        studentUsername,
+        paperId,
+        allowed: !!allowed,
+        updatedAt: new Date().toISOString()
+      };
+
+      const putReq = existing ? store.put(row) : store.add(row);
+      putReq.onsuccess = () => resolve(putReq.result);
+      putReq.onerror = () => reject('Error saving access');
+    };
+
+    getReq.onerror = () => reject('Error reading access');
+    tx.onerror = () => reject('Transaction failed');
+  });
+}
+
+function getAccess(studentUsername, paperId) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(ACCESSSTORE, 'readonly');
+    const store = tx.objectStore(ACCESSSTORE);
+    const idx = store.index('studentPaper');
+
+    const req = idx.get([studentUsername, paperId]);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject('Error retrieving access');
+  });
+}
 
         // User operations
         function addUserToDB(userData) {
