@@ -1745,6 +1745,18 @@ fetch("YOUR_WEB_APP_URL", {
                 }
             }
         }
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickRandomQuestions(allQuestions, count) {
+  return shuffleArray(allQuestions).slice(0, Math.min(count, allQuestions.length));
+}
 
         // ==================== STUDENT FUNCTIONS ====================
         async function displayStudentTest() {
@@ -1774,7 +1786,8 @@ fetch("YOUR_WEB_APP_URL", {
 
                 // Use the first matching paper
                 const paper = matchingPapers[0];
-                questions = await getQuestionsByPaperId(paper.id);
+             const allQ = await getQuestionsByPaperId(paper.id);
+            questions = pickRandomQuestions(allQ, 20);
 
                 if (questions.length === 0) {
                     container.innerHTML = `
