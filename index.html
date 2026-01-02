@@ -1330,6 +1330,26 @@ function getAccess(studentUsername, paperId) {
                 errorDiv.textContent = '❌ Login error. Please try again.';
                 errorDiv.style.display = 'block';
             }
+            try {
+    const res = await fetch(YOUR_WEB_APP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sheet: "Students",
+        username: currentUser.username,
+        class: currentUser.classGrade || "",
+        subject: currentUser.subject || "",
+        section: currentUser.section || "",
+        loginTime: new Date().toISOString()
+      })
+    });
+    console.log("Students sheet:", res.status, await res.text());
+  } catch (e) {
+    console.error("Students sheet error:", e);
+  }
+
+  showApp(currentUser.role);
+}
         }
 
         function showAddUserModal() {
@@ -1599,18 +1619,18 @@ YOUR_WEB_APP_URL="https://script.google.com/macros/s/AKfycbzqwE4IULlBTzzF2OHgrXa
                 alert('Error adding question to database');
             }
         }
-fetch("YOUR_WEB_APP_URL", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    sheet: "Students",
-    username: currentUser.username,
-    class: currentUser.classGrade,
-    subject: currentUser.subject,
-    section: currentUser.section,
-    loginTime: new Date().toISOString()
-  })
-});
+// fetch("YOUR_WEB_APP_URL", {
+//   method: "POST",
+//   headers: { "Content-Type": "application/json" },
+//   body: JSON.stringify({
+//     sheet: "Students",
+//     username: currentUser.username,
+//     class: currentUser.classGrade,
+//     subject: currentUser.subject,
+//     section: currentUser.section,
+//     loginTime: new Date().toISOString()
+//   })
+// });
 
         function showAdminMessage(message) {
             const msgDiv = document.getElementById('adminMessage');
