@@ -1005,6 +1005,19 @@
         const USERS_STORE = 'users';
 const DBVERSION = 3;                 // bump version so onupgradeneeded runs again
 const ACCESSSTORE = 'access';        // new store name
+async function postToSheet(payloadObj) {
+  const body = new URLSearchParams(payloadObj).toString();
+
+  const res = await fetch(YOUR_WEB_APP_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+    body
+  });
+
+  const text = await res.text();
+  console.log("Sheet response:", res.status, text);
+  return { res, text };
+}
 
         function initDatabase() {
             return new Promise((resolve, reject) => {
@@ -1331,18 +1344,15 @@ function getAccess(studentUsername, paperId) {
                 errorDiv.style.display = 'block';
             }
             try {
-    const res = await fetch(YOUR_WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({
-        sheet: "Students",
-        username: currentUser.username,
-        class: currentUser.classGrade || "",
-        subject: currentUser.subject || "",
-        section: currentUser.section || "",
-        loginTime: new Date().toISOString()
-      })
-    });
+    const res = await postToSheet({
+  sheet: "Students",
+  username: currentUser.username,
+  class: currentUser.classGrade || "",
+  subject: currentUser.subject || "",
+  section: currentUser.section || "",
+  loginTime: new Date().toISOString()
+});
+
     console.log("Students sheet:", res.status, await res.text());
   } catch (e) {
     console.error("Students sheet error:", e);
@@ -1531,22 +1541,23 @@ YOUR_WEB_APP_URL="https://script.google.com/macros/s/AKfycbzqwE4IULlBTzzF2OHgrXa
             const marks = parseInt(document.getElementById('marks').value) || 1;
             const category = document.getElementById('questionCategory').value || 'General';
             async function saveQuestionToSheet(question) {
-  const payload = {
-    sheet: "Questions",
-    paperId: question.paperId,
-    subject: question.subject,
-    class: question.classGrade,
-    section: question.section,
-    question: question.text,
-    optionA: question.options.A,
-    optionB: question.options.B,
-    optionC: question.options.C,
-    optionD: question.options.D,
-    correct: question.correctAnswer,
-    marks: question.marks,
-    image: question.image || "",
-    createdAt: new Date().toISOString()
-  };
+  await postToSheet({
+  sheet: "Questions",
+  paperId: question.paperId,
+  subject: question.subject,
+  class: question.classGrade,
+  section: question.section,
+  question: question.text,
+  optionA: question.options.A,
+  optionB: question.options.B,
+  optionC: question.options.C,
+  optionD: question.options.D,
+  correct: question.correctAnswer,
+  marks: String(question.marks ?? ""),
+  image: question.image || "",
+  createdAt: new Date().toISOString()
+});
+
 
   const res = await fetch(YOUR_WEB_APP_URL, {
     method: "POST",
@@ -1619,18 +1630,7 @@ YOUR_WEB_APP_URL="https://script.google.com/macros/s/AKfycbzqwE4IULlBTzzF2OHgrXa
                 alert('Error adding question to database');
             }
         }
-// fetch("YOUR_WEB_APP_URL", {
-//   method: "POST",
-//   headers: { "Content-Type": "text/plain;charset=utf-8" },
-//   body: JSON.stringify({
-//     sheet: "Students",
-//     username: currentUser.username,
-//     class: currentUser.classGrade,
-//     subject: currentUser.subject,
-//     section: currentUser.section,
-//     loginTime: new Date().toISOString()
-//   })
-// });
+
 
         function showAdminMessage(message) {
             const msgDiv = document.getElementById('adminMessage');
