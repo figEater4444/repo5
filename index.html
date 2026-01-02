@@ -1491,7 +1491,7 @@ function getAccess(studentUsername, paperId) {
                 }
             });
         }
-YOUR_WEB_APP_URL="https://script.google.com/macros/s/AKfycbybNvB4FgBVoMD7BmsWyooNEMeYDRablfkpC20Fo9woyYiV1aiSufKnGhtH5nzKMY0yug/exec";
+YOUR_WEB_APP_URL="https://script.google.com/macros/s/AKfycbzqwE4IULlBTzzF2OHgrXaTM5ThOkOXWXHRdZO5zSIX7-KN2YkuaSxMNKsfhqMCICTS/exec";
         async function addQuestion() {
             const subject = document.getElementById('subject').value.trim();
             const classGrade = document.getElementById('classGrade').value.trim();
@@ -1511,27 +1511,35 @@ YOUR_WEB_APP_URL="https://script.google.com/macros/s/AKfycbybNvB4FgBVoMD7BmsWyoo
             const marks = parseInt(document.getElementById('marks').value) || 1;
             const category = document.getElementById('questionCategory').value || 'General';
             async function saveQuestionToSheet(question) {
-  await fetch("YOUR_WEB_APP_URL", {
+  const payload = {
+    sheet: "Questions",
+    paperId: question.paperId,
+    subject: question.subject,
+    class: question.classGrade,
+    section: question.section,
+    question: question.text,
+    optionA: question.options.A,
+    optionB: question.options.B,
+    optionC: question.options.C,
+    optionD: question.options.D,
+    correct: question.correctAnswer,
+    marks: question.marks,
+    image: question.image || "",
+    createdAt: new Date().toISOString()
+  };
+
+  const res = await fetch(YOUR_WEB_APP_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      sheet: "Questions",
-      paperId: question.paperId,
-      subject: question.subject,
-      class: question.classGrade,
-      section: question.section,
-      question: question.text,
-      optionA: question.options.A,
-      optionB: question.options.B,
-      optionC: question.options.C,
-      optionD: question.options.D,
-      correct: question.correctAnswer,
-      marks: question.marks,
-      image: question.image || "",
-      createdAt: new Date().toISOString()
-    })
+    body: JSON.stringify(payload)
   });
+
+  const text = await res.text();        // <-- temporary log
+  console.log("Sheets response:", res.status, text);  // <-- temporary log
+
+  if (!res.ok) throw new Error(text);
 }
+
 
             if (!questionText || !optionA || !optionB || !optionC || !optionD || !correctAnswer) {
                 alert('Please fill in all required fields');
@@ -1571,6 +1579,17 @@ YOUR_WEB_APP_URL="https://script.google.com/macros/s/AKfycbybNvB4FgBVoMD7BmsWyoo
                 };
 
                 await addQuestionToDB(question);
+                await saveQuestionToSheet({
+  paperId: currentPaper.id,
+  subject: subject,
+  classGrade: classGrade,
+  section: section,
+  text: questionText,
+  options: { A: optionA, B: optionB, C: optionC, D: optionD },
+  correctAnswer: correctAnswer,
+  marks: marks,
+  image: currentImageData
+});
                 showAdminMessage('✅ Question added to database successfully!');
                 questions = await getQuestionsByPaperId(currentPaper.id);
                 updateDisplay();
